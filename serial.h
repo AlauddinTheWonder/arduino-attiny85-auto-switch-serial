@@ -33,7 +33,35 @@ void executeCommand(int command, String value)
   // A callback to connected device for identification of this program
   if (command == PINGBACK)
   {
-    _serial.println(PINGBACK);
+//    _serial.println(PINGBACK);
+
+    
+    _serial.print(GET_TIME);
+    _serial.print(":");
+    _serial.print(getTimeNow());
+    _serial.print("|");
+    _serial.print(GET_NUM_SWITCH);
+    _serial.print(":");
+    _serial.print(TOTAL_SWT);
+    _serial.print("|");
+    _serial.print(DRIFT_ADDR);
+    _serial.print(":");
+    _serial.print(getROMvalue(DRIFT_ADDR));
+    _serial.print("|");
+    
+    uint8_t cnt = 1;
+    for (uint8_t r = 0; r < TOTAL_SWT; r++)
+    {
+      for (uint8_t c = 1; c <= 2; c++) // 0=Pin, 1=On, 2=Off
+      {
+        _serial.print(cnt);
+        _serial.print(":");
+        _serial.print(getROMvalue(cnt));
+        _serial.print("|");
+        cnt++;
+      }
+    }
+    _serial.println("");
   }
 
   // Get current time from RTC in timestamp

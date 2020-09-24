@@ -1,5 +1,4 @@
 #define NUM_PINS_ADDR 0
-#define DRIFT_ADDR 250 // must be same as defined in DRIFT_TIME on "serial.h"
 
 void initVarsFromRom()
 {

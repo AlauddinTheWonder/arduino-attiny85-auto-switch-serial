@@ -12,6 +12,7 @@ byte wtd_cnt = 0;         // Counter for task execution comparision.
 */
 
 #define TOTAL_SWT 3     // 3 Pin controller
+#define DRIFT_ADDR 250  // Drift time address on EEPROM
 #define RxD 3 // SerialDevice Tx
 #define TxD 4 // SerialDevice Rx
 #define ModePin 1       // with 10K to Gnd. VCC to enable BT mode
