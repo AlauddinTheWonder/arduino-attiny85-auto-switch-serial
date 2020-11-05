@@ -46,5 +46,7 @@ boolean validateTime(tmElements_t tm) {
 
 void syncDriftedTime(uint8_t sec)
 {
-  setTimeNow(getTimeNow() - sec);
+  unsigned long t = getTimeNow();
+  delay(sec * 1000);
+  setTimeNow(t);
 }

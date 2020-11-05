@@ -28,6 +28,17 @@ int getOnOffStatus(int currentHour, int onTime, int offTime)
     }
 }
 
+int getIndexByPin(int arr[TOTAL_SWT], int pin)
+{
+  for (uint8_t i = 0; i < TOTAL_SWT; i++)
+  {
+    if (arr[i] == pin) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 void blinkLed(byte LedPin, int times)
 {
   if (times > 0) {

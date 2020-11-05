@@ -7,7 +7,8 @@ SoftwareSerial _serial(RxD, TxD);
 #define GET_TIME 254
 #define SET_TIME 253
 #define GET_NUM_SWITCH 252
-#define GET_ROM_VAL 251
+#define GET_MAX_SETTINGS 251
+#define GET_ROM_VAL 250
 
 String readData;
 int command = 0;
@@ -44,15 +45,15 @@ void executeCommand(int command, String value)
     _serial.print(":");
     _serial.print(TOTAL_SWT);
     _serial.print("|");
-    _serial.print(DRIFT_ADDR);
+    _serial.print(GET_MAX_SETTINGS);
     _serial.print(":");
-    _serial.print(getROMvalue(DRIFT_ADDR));
+    _serial.print(MAX_SETTINGS);
     _serial.print("|");
     
     uint8_t cnt = 1;
-    for (uint8_t r = 0; r < TOTAL_SWT; r++)
+    for (uint8_t r = 0; r < MAX_SETTINGS; r++)
     {
-      for (uint8_t c = 1; c <= 2; c++) // 0=Pin, 1=On, 2=Off
+      for (uint8_t c = 0; c <= 2; c++) // 0=Pin, 1=On, 2=Off
       {
         _serial.print(cnt);
         _serial.print(":");
@@ -80,6 +81,12 @@ void executeCommand(int command, String value)
   else if (command == GET_NUM_SWITCH)
   {
     _serial.println(TOTAL_SWT);
+  }
+  
+  // Get max settings device support
+  else if (command == GET_MAX_SETTINGS)
+  {
+    _serial.println(MAX_SETTINGS);
   }
   
   // Read value from EEPROM

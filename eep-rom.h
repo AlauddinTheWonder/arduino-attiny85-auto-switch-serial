@@ -6,29 +6,28 @@ void initVarsFromRom()
 
   if (vs == TOTAL_SWT) {
     uint8_t cnt = 1;
-    for (uint8_t r = 0; r < TOTAL_SWT; r++)
+    for (uint8_t r = 0; r < MAX_SETTINGS; r++)
     {
-      for (uint8_t c = 1; c <= 2; c++) // 0=Pin, 1=On, 2=Off
+      for (uint8_t c = 0; c <= 2; c++) // 0=Pin, 1=On, 2=Off
       {
         Switches[r][c] = EEPROM.read(cnt);
         cnt++;
       }
     }
-    driftSecond = EEPROM.read(DRIFT_ADDR);
   }
   else {
+    // First time
     EEPROM.write(NUM_PINS_ADDR, TOTAL_SWT);
 
     uint8_t cnt = 1;
-    for (uint8_t r = 0; r < TOTAL_SWT; r++)
+    for (uint8_t r = 0; r < MAX_SETTINGS; r++)
     {
-      for (uint8_t c = 1; c <= 2; c++) // 0=Pin, 1=On, 2=Off
+      for (uint8_t c = 0; c <= 2; c++) // 0=Pin, 1=On, 2=Off
       {
         EEPROM.write(cnt, Switches[r][c]);
         cnt++;
       }
     }
-    EEPROM.write(DRIFT_ADDR, driftSecond);
   }
 }
 

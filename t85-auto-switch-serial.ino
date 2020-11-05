@@ -8,7 +8,7 @@
    3. TinyWireM
    4. EEPROM
 
-   Build Size: 7096 bytes (ATtiny85, 8MHz);
+   Build Size: 7078 bytes (ATtiny85, 8MHz);
 */
 
 #include <EEPROM.h>
@@ -16,10 +16,6 @@
 #include <TinyRTC.h>
 
 // Dependent files
-/*
- serial.ino
- eep-rom.ino
- */
 #include "config.h"
 #include "watchdog.h"
 #include "functions.h"
@@ -28,11 +24,18 @@
 #include "serial.h"
 
 
+// Watchdog Settings
+#define WD_MODE 9        // 6=1sec (0.5sec), 7=2sec (1sec), 8=4sec (3.2sec), 9=8sec (7.4sec)
+#define WD_CNT_RESET 75  // Actual task will be executed after this counter.
+byte wtd_cnt = 0;         // Counter for task execution comparision.
+
+boolean ConfigMode = false;   // indicate whether config mode is enabled or not
+byte swt[TOTAL_SWT];
 
 void setup() {
-  pinMode(ModePin, INPUT);
+  pinMode(MODE_PIN, INPUT);
 
-  if (digitalRead(ModePin)) {
+  if (digitalRead(MODE_PIN)) {
     ConfigMode = true;
     enableConfigMode(); // serial.h
   }
@@ -41,14 +44,12 @@ void setup() {
 
     for (uint8_t r = 0; r < TOTAL_SWT; r++)
     {
-      uint8_t pin = Switches[r][0];
-
-      pinMode(pin, OUTPUT);
-      digitalWrite(pin, LOW);
+      pinMode(PinArray[r], OUTPUT);
+      digitalWrite(PinArray[r], LOW);
     }
 
     connectRTC();
-    setup_watchdog(wtd_mode);
+    setup_watchdog(WD_MODE);
   }
 
   initVarsFromRom();
@@ -58,7 +59,7 @@ void setup() {
 
 void loop() {
   if (ConfigMode) {
-    runSerialMode();
+    runSerialMode(); // serial.h
   }
   else {
     if (wtd_cnt == 0) {
@@ -67,47 +68,40 @@ void loop() {
 
       delay(100);
 
-      if (validateTime(tm)) {
+      byte _hour = tm.Hour;
 
-        byte _hour = tm.Hour;
+      // Reset pins to LOW
+      for (byte a = 0; a < TOTAL_SWT; a++)
+      {
+        swt[a] = 0;
+      }
 
-        for (uint8_t r = 0; r < TOTAL_SWT; r++)
-        {
-          uint8_t pin = Switches[r][0];
-          uint8_t on = Switches[r][1];
-          uint8_t off = Switches[r][2];
+      // Calculating switch on/off status
+      for (uint8_t b = 0; b < MAX_SETTINGS; b++)
+      {
+        uint8_t pin = Switches[b][0];
+        uint8_t on = Switches[b][1];
+        uint8_t off = Switches[b][2];
+        
+        byte swt_status = getOnOffStatus(_hour, on, off);
+        int idx = getIndexByPin(PinArray, pin);
 
-          byte switch_status = getOnOffStatus(_hour, on, off);
-          digitalWrite(pin, switch_status);
-          delay(100);
+        if (swt_status == 1 && idx >= 0) {
+          swt[idx] = 1;
         }
+      }
 
-        delay(500);
-
-
-        // Delay time to sync drifted time in RTC module
-        if (_hour != last_hour) {
-          if (initialized) { // Ignore initial call.
-
-            // Sync drifted time
-            // This will correct drifted second in every hour
-            // Second must be less than 60 seconds.
-            if (driftSecond > 0) {
-              // Update RTC module time with adjusted time
-              // In TimeFunctions.h file
-              syncDriftedTime(driftSecond);
-            }
-          }
-          last_hour = _hour;
-        }
-
-        initialized = true;
+      // Setting switch on/off
+      for (byte c = 0; c < TOTAL_SWT; c++)
+      {
+        digitalWrite(PinArray[c], swt[c]);
+        delay(100);
       }
     }
 
     wtd_cnt++;
 
-    if (wtd_cnt >= wtd_cnt_reset) {
+    if (wtd_cnt >= WD_CNT_RESET) {
       wtd_cnt = 0;
     }
 
