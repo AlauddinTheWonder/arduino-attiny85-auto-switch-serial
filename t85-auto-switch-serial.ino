@@ -8,7 +8,7 @@
    3. TinyWireM
    4. EEPROM
 
-   Build Size: 6926 bytes (ATtiny85, 8MHz);
+   Build Size: 5632 bytes (ATtiny85, 8MHz);
 */
 
 #include <EEPROM.h>

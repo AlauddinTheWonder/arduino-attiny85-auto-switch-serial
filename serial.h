@@ -1,6 +1,7 @@
 SoftwareSerial _serial(RxD, TxD);
 
 #define MAX_ROM_VAL 255
+#define CHAR_LEN 15
 
 // Commands
 #define PINGBACK 255
@@ -10,28 +11,23 @@ SoftwareSerial _serial(RxD, TxD);
 #define GET_MAX_SETTINGS 251
 #define GET_ROM_VAL 250
 
-String readData;
-uint8_t command = 0;
-unsigned long prevMills = 0;
+
+uint32_t prevMills = 0;
+uint8_t _command = 0;
 char col = ':';
 char pipe = '|';
 
 void enableConfigMode()
 {
   _serial.begin(9600);
-
   delay(500);
 }
 
-void printError()
+void executeCommand(uint8_t command, char * value)
 {
-  _serial.println(-1);
-}
-
-void executeCommand(uint8_t command, String value)
-{
-  long val = value.toInt();
-
+  uint8_t val_i = atoi(value);
+  uint32_t val_l = atol(value);
+  
   if (command == PINGBACK)
   {
     _serial.print(GET_TIME);
@@ -70,8 +66,8 @@ void executeCommand(uint8_t command, String value)
     _serial.println(getTimeNow());
   }
   // Set RTC time, value in timestamp
-  else if (command == SET_TIME && val > 0) {
-    setTimeNow(val);
+  else if (command == SET_TIME && value > 0) {
+    setTimeNow(val_l);
     delay(100);
     _serial.println(getTimeNow());
   }
@@ -89,32 +85,32 @@ void executeCommand(uint8_t command, String value)
   }
   
   // Read value from EEPROM
-  else if (command == GET_ROM_VAL && (val >= 0 && val <= MAX_ROM_VAL))
+  else if (command == GET_ROM_VAL && (val_i >= 0 && val_i <= MAX_ROM_VAL))
   {
-    _serial.println(getROMvalue(byte(val)));
+    _serial.println(getROMvalue(byte(val_i)));
   }
 
   // Write value to EEPROM
-  else if (command >= 0 && command <= MAX_ROM_VAL && val >= 0 && val < MAX_ROM_VAL)
+  else if (command >= 0 && command <= MAX_ROM_VAL && val_i >= 0 && val_i < MAX_ROM_VAL)
   {
-    setROMvalue(command, byte(val));
+    setROMvalue(command, byte(val_i));
     delay(50);
     _serial.println(getROMvalue(byte(command)));
   }
   else {
-    printError();
+    _serial.println(-1);
   }
 }
 
-void analyzeData(String str)
+void analyzeData(char * value)
 {
-  if (command > 0 && (millis() - prevMills < 2000)) {
-    executeCommand(command, str);
-    command = 0;
+  if (_command > 0 && (millis() - prevMills < 2000)) {
+    executeCommand(_command, value);
+    _command = 0;
   }
   else {
     prevMills = millis();
-    command = str.toInt();
+    _command = atoi(value);
   }
 }
 
@@ -124,14 +120,10 @@ void runSerialMode()
   
   while(_serial.available())
   {
-    char c = _serial.read();
-    readData += c;
-    delay(10);
-  }
+    char buff[CHAR_LEN];
+    uint8_t x = _serial.readBytes(buff, CHAR_LEN - 1);
+    buff[x] = '\0';
 
-  if(readData.length() > 0)
-  {
-    analyzeData(readData);
-    readData = "";
+    analyzeData(buff);
   }
 }
