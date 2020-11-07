@@ -11,11 +11,8 @@ SoftwareSerial _serial(RxD, TxD);
 #define GET_MAX_SETTINGS 251
 #define GET_ROM_VAL 250
 
-
-uint32_t prevMills = 0;
-uint8_t _command = 0;
-char col = ':';
-char pipe = '|';
+const char SymbCol = ':';
+const char SymbPipe = '|';
 
 void enableConfigMode()
 {
@@ -31,19 +28,19 @@ void executeCommand(uint8_t command, char * value)
   if (command == PINGBACK)
   {
     _serial.print(GET_TIME);
-    _serial.print(col);
+    _serial.print(SymbCol);
     _serial.print(getTimeNow());
-    _serial.print(pipe);
+    _serial.print(SymbPipe);
 
     _serial.print(GET_NUM_SWITCH);
-    _serial.print(col);
+    _serial.print(SymbCol);
     _serial.print(TOTAL_SWT);
-    _serial.print(pipe);
+    _serial.print(SymbPipe);
 
     _serial.print(GET_MAX_SETTINGS);
-    _serial.print(col);
+    _serial.print(SymbCol);
     _serial.print(MAX_SETTINGS);
-    _serial.print(pipe);
+    _serial.print(SymbPipe);
     
     uint8_t cnt = 1;
     for (uint8_t r = 0; r < MAX_SETTINGS; r++)
@@ -51,9 +48,9 @@ void executeCommand(uint8_t command, char * value)
       for (uint8_t c = 0; c <= 2; c++) // 0=Pin, 1=On, 2=Off
       {
         _serial.print(cnt);
-        _serial.print(col);
+        _serial.print(SymbCol);
         _serial.print(getROMvalue(cnt));
-        _serial.print(pipe);
+        _serial.print(SymbPipe);
         cnt++;
       }
     }
@@ -102,18 +99,6 @@ void executeCommand(uint8_t command, char * value)
   }
 }
 
-void analyzeData(char * value)
-{
-  if (_command > 0 && (millis() - prevMills < 2000)) {
-    executeCommand(_command, value);
-    _command = 0;
-  }
-  else {
-    prevMills = millis();
-    _command = atoi(value);
-  }
-}
-
 void runSerialMode()
 {
   while (!_serial.available());
@@ -124,6 +109,12 @@ void runSerialMode()
     uint8_t x = _serial.readBytes(buff, CHAR_LEN - 1);
     buff[x] = '\0';
 
-    analyzeData(buff);
+    char* token = strtok(buff, ":");
+    uint8_t _command = atoi(token);
+    token = strtok(NULL, ":");
+
+    if (_command > 0 && token != NULL) {
+      executeCommand(_command, token);
+    }
   }
 }
