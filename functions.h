@@ -4,7 +4,7 @@
  * General Functions
  */
 
-int getOnOffStatus(int currentHour, int onTime, int offTime)
+uint8_t getOnOffStatus(uint8_t currentHour, uint8_t onTime, uint8_t offTime)
 {
     if (onTime == offTime) {
         return 0;
@@ -28,7 +28,7 @@ int getOnOffStatus(int currentHour, int onTime, int offTime)
     }
 }
 
-int getIndexByPin(int arr[TOTAL_SWT], int pin)
+int8_t getIndexByPin(uint8_t arr[TOTAL_SWT], uint8_t pin)
 {
   for (uint8_t i = 0; i < TOTAL_SWT; i++)
   {
@@ -37,21 +37,4 @@ int getIndexByPin(int arr[TOTAL_SWT], int pin)
     }
   }
   return -1;
-}
-
-void blinkLed(byte LedPin, int times)
-{
-  if (times > 0) {
-    for (int i = 0; i < times; i++) {
-      digitalWrite(LedPin, HIGH);
-      delay(200);
-      digitalWrite(LedPin, LOW);
-      delay(350);
-    }
-  } else {
-    digitalWrite(LedPin, HIGH);
-    delay(100);
-    digitalWrite(LedPin, LOW);
-    delay(350);
-  }
 }

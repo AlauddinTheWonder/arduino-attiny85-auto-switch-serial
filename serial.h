@@ -11,8 +11,10 @@ SoftwareSerial _serial(RxD, TxD);
 #define GET_ROM_VAL 250
 
 String readData;
-int command = 0;
+uint8_t command = 0;
 unsigned long prevMills = 0;
+char col = ':';
+char pipe = '|';
 
 void enableConfigMode()
 {
@@ -26,29 +28,26 @@ void printError()
   _serial.println(-1);
 }
 
-void executeCommand(int command, String value)
+void executeCommand(uint8_t command, String value)
 {
   long val = value.toInt();
 
-  // Indicates _serial is connected with master device
-  // A callback to connected device for identification of this program
   if (command == PINGBACK)
   {
-//    _serial.println(PINGBACK);
-
-    
     _serial.print(GET_TIME);
-    _serial.print(":");
+    _serial.print(col);
     _serial.print(getTimeNow());
-    _serial.print("|");
+    _serial.print(pipe);
+
     _serial.print(GET_NUM_SWITCH);
-    _serial.print(":");
+    _serial.print(col);
     _serial.print(TOTAL_SWT);
-    _serial.print("|");
+    _serial.print(pipe);
+
     _serial.print(GET_MAX_SETTINGS);
-    _serial.print(":");
+    _serial.print(col);
     _serial.print(MAX_SETTINGS);
-    _serial.print("|");
+    _serial.print(pipe);
     
     uint8_t cnt = 1;
     for (uint8_t r = 0; r < MAX_SETTINGS; r++)
@@ -56,9 +55,9 @@ void executeCommand(int command, String value)
       for (uint8_t c = 0; c <= 2; c++) // 0=Pin, 1=On, 2=Off
       {
         _serial.print(cnt);
-        _serial.print(":");
+        _serial.print(col);
         _serial.print(getROMvalue(cnt));
-        _serial.print("|");
+        _serial.print(pipe);
         cnt++;
       }
     }

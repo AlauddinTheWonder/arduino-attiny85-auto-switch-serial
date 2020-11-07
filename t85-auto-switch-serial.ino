@@ -8,7 +8,7 @@
    3. TinyWireM
    4. EEPROM
 
-   Build Size: 7078 bytes (ATtiny85, 8MHz);
+   Build Size: 6926 bytes (ATtiny85, 8MHz);
 */
 
 #include <EEPROM.h>
@@ -27,10 +27,8 @@
 // Watchdog Settings
 #define WD_MODE 9        // 6=1sec (0.5sec), 7=2sec (1sec), 8=4sec (3.2sec), 9=8sec (7.4sec)
 #define WD_CNT_RESET 75  // Actual task will be executed after this counter.
-byte wtd_cnt = 0;         // Counter for task execution comparision.
-
+uint8_t wtd_cnt = 0;         // Counter for task execution comparision.
 boolean ConfigMode = false;   // indicate whether config mode is enabled or not
-byte swt[TOTAL_SWT];
 
 void setup() {
   pinMode(MODE_PIN, INPUT);
@@ -68,23 +66,15 @@ void loop() {
 
       delay(100);
 
-      byte _hour = tm.Hour;
+      uint8_t _hour = tm.Hour;
 
-      // Reset pins to LOW
-      for (byte a = 0; a < TOTAL_SWT; a++)
-      {
-        swt[a] = 0;
-      }
+      uint8_t swt[TOTAL_SWT] = {}; // Initialized with 0
 
       // Calculating switch on/off status
       for (uint8_t b = 0; b < MAX_SETTINGS; b++)
-      {
-        uint8_t pin = Switches[b][0];
-        uint8_t on = Switches[b][1];
-        uint8_t off = Switches[b][2];
-        
-        byte swt_status = getOnOffStatus(_hour, on, off);
-        int idx = getIndexByPin(PinArray, pin);
+      {        
+        uint8_t swt_status = getOnOffStatus(_hour, Switches[b][1], Switches[b][2]);
+        int8_t idx = getIndexByPin(PinArray, Switches[b][0]);
 
         if (swt_status == 1 && idx >= 0) {
           swt[idx] = 1;
@@ -92,7 +82,7 @@ void loop() {
       }
 
       // Setting switch on/off
-      for (byte c = 0; c < TOTAL_SWT; c++)
+      for (uint8_t c = 0; c < TOTAL_SWT; c++)
       {
         digitalWrite(PinArray[c], swt[c]);
         delay(100);

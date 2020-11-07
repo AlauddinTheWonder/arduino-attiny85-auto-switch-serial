@@ -34,7 +34,7 @@
  * Device: 001 => 1 = Extra, 2 = Light, 3 = Filter
  */
 
-const int PinArray[TOTAL_SWT] = { SWT_1, SWT_2, SWT_3 };
+const uint8_t PinArray[TOTAL_SWT] = { SWT_1, SWT_2, SWT_3 };
 
 uint8_t Switches[MAX_SETTINGS][3] = {
   {SWT_1, 0, 0},
@@ -43,8 +43,5 @@ uint8_t Switches[MAX_SETTINGS][3] = {
   {SWT_3, 11, 13},
   {SWT_3, 14, 17},
   {SWT_3, 18, 20},
-  {SWT_3, 21, 0},
-  {0, 0, 0},
-  {0, 0, 0},
-  {0, 0, 0}
+  {SWT_3, 21, 0}
 };

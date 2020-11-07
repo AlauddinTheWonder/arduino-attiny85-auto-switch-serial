@@ -2,13 +2,13 @@
 
 void initVarsFromRom()
 {
-  int vs = EEPROM.read(NUM_PINS_ADDR);
+  byte vs = EEPROM.read(NUM_PINS_ADDR);
 
   if (vs == TOTAL_SWT) {
-    uint8_t cnt = 1;
-    for (uint8_t r = 0; r < MAX_SETTINGS; r++)
+    byte cnt = 1;
+    for (byte r = 0; r < MAX_SETTINGS; r++)
     {
-      for (uint8_t c = 0; c <= 2; c++) // 0=Pin, 1=On, 2=Off
+      for (byte c = 0; c <= 2; c++) // 0=Pin, 1=On, 2=Off
       {
         Switches[r][c] = EEPROM.read(cnt);
         cnt++;
@@ -19,10 +19,10 @@ void initVarsFromRom()
     // First time
     EEPROM.write(NUM_PINS_ADDR, TOTAL_SWT);
 
-    uint8_t cnt = 1;
-    for (uint8_t r = 0; r < MAX_SETTINGS; r++)
+    byte cnt = 1;
+    for (byte r = 0; r < MAX_SETTINGS; r++)
     {
-      for (uint8_t c = 0; c <= 2; c++) // 0=Pin, 1=On, 2=Off
+      for (byte c = 0; c <= 2; c++) // 0=Pin, 1=On, 2=Off
       {
         EEPROM.write(cnt, Switches[r][c]);
         cnt++;
