@@ -28,20 +28,16 @@
 #define MAX_SETTINGS 10 // Number of settings saved
 
 
+const uint8_t PinArray[TOTAL_SWT] = { SWT_1, SWT_2, SWT_3 };
+
 /** 
  * Time schedule (in Hour) -- Same on and off value means disable
  * Switches = { Pin, OnHour, OffHour }
  * Device: 001 => 1 = Extra, 2 = Light, 3 = Filter
  */
 
-const uint8_t PinArray[TOTAL_SWT] = { SWT_1, SWT_2, SWT_3 };
-
 uint8_t Switches[MAX_SETTINGS][3] = {
-  {SWT_1, 0, 0},
-  {SWT_2, 10, 18},
-  {SWT_3, 6, 10},
-  {SWT_3, 11, 13},
-  {SWT_3, 14, 17},
-  {SWT_3, 18, 20},
-  {SWT_3, 21, 0}
+  {1, 0, 0},
+  {2, 10, 18},
+  {3, 6, 23}
 };

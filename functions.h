@@ -27,14 +27,3 @@ uint8_t getOnOffStatus(uint8_t currentHour, uint8_t onTime, uint8_t offTime)
         return 0;
     }
 }
-
-int8_t getIndexByPin(uint8_t arr[TOTAL_SWT], uint8_t pin)
-{
-  for (uint8_t i = 0; i < TOTAL_SWT; i++)
-  {
-    if (arr[i] == pin) {
-      return i;
-    }
-  }
-  return -1;
-}
