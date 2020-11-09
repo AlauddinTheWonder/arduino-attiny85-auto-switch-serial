@@ -19,12 +19,12 @@ Simple low powered automation to switch 3 AC sockets and controlled by Serial De
 Pin   | Name         | Wire connection
 ----- | ------------ | ---------------
 1     | Reset        | Not connected              
-2     | I/O Pin 3    | Switch 2, UART: Tx         
-3     | I/O Pin 4    | Switch 3, UART: Rx         
+2     | DPIO 3       | Switch 2, UART: Tx         
+3     | DPIO 4       | Switch 3, UART: Rx         
 4     | GND          | Connected to Ground        
-5     | I/O Pin 0    | RTC SDA                    
-6     | I/O Pin 1    | Switch 1, Mode change pin
-7     | I/O Pin 2    | RTC SCL                    
+5     | DPIO 0       | RTC SDA                    
+6     | DPIO 1       | Switch 1, Mode change pin
+7     | DPIO 2       | RTC SCL                    
 8     | VCC          | Connected to +3.3v to +5v  
 
 
@@ -36,36 +36,39 @@ Pin   | Name         | Wire connection
 
 To access device from UART Device, start device in Config mode by connecting MODE pin with VCC.
 
-For commands, have to send two bytes with 50ms gap.
+For commands, have to send COMMAND and VALUE concated with colon. For ex.
 ```
--> First byte will be COMMAND
--> Second byte will be PARAMS (Values)
+255:0
 ```
 
 Command details:
 
 Sr No  | Command  | Param      | Return      | Description
 ------ | -------- | -----------| ----------- | -----------
-1      | 255      | 0          | 255         | Pingback. To recognize this device
+1      | 255      | 0          | ALL_INFO*   | Get all information from device with PIPE separated.
 2      | 254      | 0          | TIMESTAMP   | Get RTC time in timestamp (UTC)
 3      | 253      | TIMESTAMP  | SAME_PARAM  | Set RTC time, value in timestampt (UTC). Return the same as Param if success
 4      | 252      | 0          | 1-30        | Get number of switch device support. Ex. 3
-5      | 251      | ROM_ADDR   | 0-255       | Read value from EEPROM. To read switch value. ROM_ADDR will be between 0 and (PIN_COUNT * 2)
-6      | 251      | 250        | 0-59        | Get time drift in second(s)
-7      | 250      | 0-59       | SAME_PARAM  | Set time drift in second(s)
-8      | 0-60     | 0-23       | SAME_PARAM  | Write value to EEPROM. Set hours to switches.
+4      | 251      | 0          | 1-30        | Get number of settings allowed by device.
+5      | 250      | ROM_ADDR   | 0-255       | Read value from EEPROM. To read switch value. ROM_ADDR will be between 0 and (PIN_COUNT * 3)
+8      | 0-90     | 0-23       | SAME_PARAM  | Write value to EEPROM. Set hours to switches.
 
 
-> To update Switch on-off hour:
+> `*` All info response
+```
+254:1234567890|252:3|251:4|1:1|2:0|3:0|4:2|5:10|6:18|7:3|8:6|9:29|10:0|11:0|12:0|
+```
+
+> Example to update Switch on-off hour:
 
 Switch    | Command | Param
 --------- | ------- | ------
-Swt 1 On  | 0       | 0-23
-Swt 1 Off | 1       | 0-23
-Swt 2 On  | 2       | 0-23
-Swt 2 Off | 3       | 0-23
-Swt 3 On  | 4       | 0-23
-Swt 3 Off | 5       | 0-23
+Swt 1     | 1       | 1
+Swt 1 On  | 2       | 0-23
+Swt 1 Off | 3       | 0-23
+Swt 2     | 4       | 2
+Swt 2 on  | 5       | 0-23
+Swt 2 off | 6       | 0-23
 so on...  |         |     
 
 
