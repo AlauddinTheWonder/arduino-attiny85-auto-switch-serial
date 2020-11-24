@@ -4,12 +4,13 @@ SoftwareSerial _serial(RxD, TxD);
 #define CHAR_LEN 15
 
 // Commands
-#define PINGBACK 255
-#define GET_TIME 254
-#define SET_TIME 253
-#define GET_NUM_SWITCH 252
-#define GET_MAX_SETTINGS 251
-#define GET_ROM_VAL 250
+#define PING_BACK 255
+#define GET_ALL 254
+#define GET_TIME 253
+#define SET_TIME 252
+#define GET_NUM_SWITCH 251
+#define GET_MAX_SETTINGS 250
+#define GET_ROM_VAL 249
 
 const char SymbCol = ':';
 const char SymbPipe = '|';
@@ -24,8 +25,12 @@ void executeCommand(uint8_t command, char * value)
 {
   uint8_t val_i = atoi(value);
   uint32_t val_l = atol(value);
-  
-  if (command == PINGBACK)
+
+  if (command == PING_BACK)
+  {
+    _serial.println(PING_BACK);
+  }
+  else if (command == GET_ALL)
   {
     _serial.print(GET_TIME);
     _serial.print(SymbCol);

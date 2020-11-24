@@ -7,7 +7,7 @@
 uint8_t getOnOffStatus(uint8_t currentHour, uint8_t onTime, uint8_t offTime)
 {
     if (onTime == offTime) {
-        return 0;
+        return 1;
     }
 
     if (onTime < offTime) {

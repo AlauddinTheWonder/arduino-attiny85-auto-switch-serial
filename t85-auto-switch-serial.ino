@@ -8,7 +8,7 @@
    3. TinyWireM
    4. EEPROM
 
-   Build Size: 5606 bytes (ATtiny85, 8MHz);
+   Build Size: 5616 bytes (ATtiny85, 8MHz);
 */
 
 #include <EEPROM.h>
@@ -73,11 +73,12 @@ void loop() {
       // Calculating switch on/off status
       for (uint8_t b = 0; b < MAX_SETTINGS; b++)
       {
-        if (Switches[b][0] <= TOTAL_SWT) {
+        uint8_t pin = Switches[b][0];
+        if (pin > 0 && pin <= TOTAL_SWT) {
           uint8_t swt_status = getOnOffStatus(_hour, Switches[b][1], Switches[b][2]);
           
           if (swt_status == 1) {
-            swt[Switches[b][0] - 1] = 1;
+            swt[pin - 1] = 1;
           }
         }
       }
